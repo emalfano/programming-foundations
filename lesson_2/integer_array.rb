@@ -1,6 +1,5 @@
 =begin
 a method that takes an array of integers, and returns a new array with every other element
-
 casual pseudo-code:
 given an array of integers
 declare a new array to hold every other element of the array
