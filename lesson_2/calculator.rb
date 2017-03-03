@@ -39,7 +39,7 @@ loop do
 end
 
 prompt("Hi #{name}")
- 
+
 loop do # main loop
   number1 = ''
   loop do
@@ -67,18 +67,18 @@ loop do # main loop
   
   #prompt("What operation would you like to perform? 1) add 2) subtract 
   #3) multiply 4) divide")
-  
+
   #this is a heredoc
   operator_prompt = <<-MSG
     What operation would you like to perform?
-    1) add 
-    2) subtract 
-    3) multiply 
+    1) add
+    2) subtract
+    3) multiply
     4) divide
   MSG
-  
+
   prompt(operator_prompt)
-  
+
   operator = ''
   loop do
     operator = Kernel.gets().chomp()
@@ -98,10 +98,10 @@ loop do # main loop
   #   result = number1.to_f() / number2.to_f()
   # end
   # change if/else to case statement
-  
+
   prompt("#{operation_to_message(operator)} the two numbers...")
   sleep 1
-  
+
   result =  case operator
             when '1'
               number1.to_i() + number2.to_i()
