@@ -51,7 +51,7 @@ loop do # main loop
       prompt("Hmm..doesn't look like a valid number")
     end
   end
-  
+
   number2 = ''
   loop do
     prompt("What's the second number?")
@@ -62,13 +62,13 @@ loop do # main loop
       prompt("Hmm..doesn't look like a valid number")
     end
   end
-  
-  prompt("the numbers are: " + number1 + " " + number2)
-  
-  #prompt("What operation would you like to perform? 1) add 2) subtract 
-  #3) multiply 4) divide")
 
-  #this is a heredoc
+  prompt("the numbers are: " + number1 + " " + number2)
+
+  # prompt("What operation would you like to perform? 1) add 2) subtract
+  # 3) multiply 4) divide")
+
+  # this is a heredoc
   operator_prompt = <<-MSG
     What operation would you like to perform?
     1) add
