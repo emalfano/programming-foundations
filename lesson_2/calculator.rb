@@ -12,9 +12,13 @@ end
 def valid_number?(num)
   num.to_i() != 0
 end
-
+# improved integer validation
+def integer?(num)
+  num.to_i.to_s == num
+end
+  
 def operation_to_message(op)
-  case op
+  word = case op
   when '1'
     'Adding'
   when '2'
@@ -24,6 +28,8 @@ def operation_to_message(op)
   when '4'
     'Dividing'
   end
+  x = "Random line of code"
+  word
 end
 
 prompt("Welcome to Calculator! Enter your name:")
@@ -45,7 +51,7 @@ loop do # main loop
   loop do
     prompt("What's the first number?")
     number1 = Kernel.gets().chomp()
-    if valid_number?(number1)
+    if integer?(number1)
       break
     else
       prompt("Hmm..doesn't look like a valid number")
@@ -56,7 +62,7 @@ loop do # main loop
   loop do
     prompt("What's the second number?")
     number2 = Kernel.gets().chomp()
-    if valid_number?(number2)
+    if integer?(number2)
       break
     else
       prompt("Hmm..doesn't look like a valid number")
