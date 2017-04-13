@@ -1,6 +1,13 @@
 # Rock paper scissors
 VALID_CHOICES = { r: 'rock', p: 'paper', sc: 'scissors', sp: 'spock',
                   l: 'lizard' }
+WINNING_COMBINATIONS = {
+  rock: ['scissors', 'lizard'],
+  paper: ['rock', 'spock'],
+  scissors: ['paper', 'lizard'],
+  spock: ['scissors', 'rock'],
+  lizard: ['paper', 'spock']
+}
 player_wins = 0
 computer_wins = 0
 ties = 0
@@ -21,11 +28,7 @@ def display_results(player, computer)
 end
 
 def win?(first, second)
-  (first == 'rock' && (second == 'scissors' || second == 'lizard')) ||
-    (first == 'paper' && (second == 'rock' || second == 'spock')) ||
-    (first == 'scissors' && (second == 'paper' || second == 'lizard')) ||
-    (first == 'spock' && (second == 'scissors' || second == 'rock')) ||
-    (first == 'lizard' && (second == 'spock' || second == 'spock'))
+  WINNING_COMBINATIONS[first.to_sym].include?(second)
 end
 
 def get_winner(player, computer)
@@ -38,19 +41,35 @@ def get_winner(player, computer)
   end
 end
 
+def game_over(player_wins, computer_wins, ties)
+  player_wins == 5 || computer_wins == 5 || ties == 5
+end
+
+def we_have_a_winner(player_wins, computer_wins, ties)
+  if player_wins > computer_wins && player_wins > ties
+    'Player'
+  elsif computer_wins > player_wins && computer_wins > ties
+    'Computer'
+  else
+    'It is a tie!'
+  end
+end
+
+pick_one = []
+VALID_CHOICES.each do |key, value|
+  pick_one.push("#{key} for #{value}")
+end
+choose_one = "Choose one: #{pick_one.join(', ')}"
+
+prompt('Welcome to Rock Paper Scissors Spock Lizard!')
 loop do
   choice = ''
-  prompt('Welcome to Rock Paper Scissors Spock Lizard!')
   loop do
-    pick_one = []
-    VALID_CHOICES.each do |key, value|
-      pick_one.push("#{key} for #{value}")
-    end
-    prompt("Choose one: #{pick_one.join(', ')}")
+    prompt(choose_one)
     choice = Kernel.gets().chomp().to_sym
 
-    if VALID_CHOICES.keys.include?(choice)
-      choice = VALID_CHOICES[choice]
+    if VALID_CHOICES.keys.include?(choice.downcase)
+      choice = VALID_CHOICES[choice.downcase]
       break
     else
       prompt("That's not a valid choice")
@@ -69,13 +88,22 @@ loop do
   else
     ties += 1
   end
+  answer = ''
+  loop do
+    prompt('Do you want to play again? (y/n)')
+    answer = Kernel.gets().chomp()
+    break if answer.downcase().start_with?('y', 'n')
+    prompt("Please select y or n")
+  end
 
-  prompt('Do you want to play again?')
-  answer = Kernel.gets().chomp()
-  break unless answer.downcase().start_with?('y')
+  break if game_over(player_wins, computer_wins, ties) ||
+           !answer.downcase().start_with?('y')
 end
 
 prompt("Player won #{player_wins} time(s)")
 prompt("Computer won #{computer_wins} time(s)")
 prompt("There were #{ties} ties")
+prompt('')
+prompt("And the overall winner is:\
+ #{we_have_a_winner(player_wins, computer_wins, ties)}!!!")
 prompt('Thank you for playing!')
