@@ -97,3 +97,17 @@ eval how_deep # shouldn't this give an error? my guess is 42
 flintstones = ["Fred", "Wilma"]
 flintstones << ["Barney", "Betty"]
 flintstones << ["BamBam", "Pebbles"]
+
+flintstones.flatten!
+p flintstones
+
+# Q 9
+# Turn this into an array containing only two elements: Barney's name and Barney's number 
+flintstones = { "Fred" => 0, "Wilma" => 1, "Barney" => 2, "Betty" => 3, 
+                "BamBam" => 4, "Pebbles" => 5 }
+puts flintstones["Barney"]
+
+array = ["Barney", flintstones["Barney"]]
+p array
+# LS soln
+p flintstones.assoc("Barney")
