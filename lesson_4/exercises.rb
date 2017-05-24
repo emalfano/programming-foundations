@@ -261,3 +261,34 @@ def titleize(str)
   str = words.join(" ")
 end
 p titleize("The Flintstones Rock")
+# ls soln
+words = "The Flintstones Rock"
+words.split.map { |word| word.capitalize }.join(' ')
+
+# ex 10 
+munsters = {
+  "Herman" => { "age" => 32, "gender" => "male" },
+  "Lily" => { "age" => 30, "gender" => "female" },
+  "Grandpa" => { "age" => 402, "gender" => "male" },
+  "Eddie" => { "age" => 10, "gender" => "male" },
+  "Marilyn" => { "age" => 23, "gender" => "female"}
+}
+
+=begin
+Modify the hash such that each member of the Munster family has an additional 
+"age_group" key that has one of three values describing the age group the
+family member is in (kid, adult, or senior). Your solution should produce the hash below
+=end
+
+munsters.each do |name, info|
+  case info["age"]
+  when 1...17
+    info["age_group"] = "kid"
+  when 18..80
+    info["age_group"] = "adult"
+  else
+    info["age_group"] = "senior"
+  end
+end
+
+p munsters
