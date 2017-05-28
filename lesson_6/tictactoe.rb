@@ -14,7 +14,7 @@ def display_board(brd)
   puts "     |     |"
   puts "-----+-----+-----"
   puts "     |     |"
-  puts "  #{brd[6]}  |  #{brd[8]}  |  #{brd[9]}"
+  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
   puts "     |     |"
   puts ""
 end
@@ -25,9 +25,22 @@ def initialize_board
   new_board
 end
 
-def player_places_piece(brd)
-  prompt "Choose a square (1-9)"
-  square = gets.chomp.to_i
+def empty_squares(brd)
+  brd.keys.select { |num| brd[num] == ' '}
+end
+
+def player_places_piece!(brd)
+  square = ''
+  loop do
+    prompt "Choose a square (1-9)"
+    square = gets.chomp.to_i  
+    if empty_squares(brd).include?(square)
+      break
+    else
+      prompt "Sorry that is not a valid choice"
+    end
+  end
+  
   # modify board
   brd[square] = 'X'
 end
@@ -36,6 +49,6 @@ board = initialize_board
 display_board(board)
 
 # ask the user to mark a square
-player_places_piece(board)
+player_places_piece!(board)
 puts board.inspect
 display_board(board)
