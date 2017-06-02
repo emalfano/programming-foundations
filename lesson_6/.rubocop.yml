@@ -237,7 +237,7 @@ Metrics/MethodLength:
   Description: 'Avoid methods longer than 10 lines of code.'
   Enabled: true
   CountComments: false  # count full line comments?
-  Max: 15
+  Max: 10
 
 Lint/LiteralInInterpolation:
   Description: 'Avoid interpolating literals in strings'
