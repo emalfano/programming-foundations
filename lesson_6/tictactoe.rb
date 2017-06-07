@@ -86,8 +86,36 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker)  == 2
+    board.select{ |k,v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  else
+    nil
+  end
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample # this returns an integer
+  square = nil
+  
+  # computer AI defense
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd, PLAYER_MARKER)
+    break if square
+  end
+  
+  # computer AI offense
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, COMPUTER_MARKER)
+      break if square
+    end
+  end
+
+  # pick a random square
+  if !square
+    square = empty_squares(brd).sample # this returns an integer
+  end
+
   brd[square] = COMPUTER_MARKER
 end
 
