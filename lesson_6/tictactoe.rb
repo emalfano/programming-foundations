@@ -7,6 +7,8 @@ COMPUTER_MARKER = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]]              # diagonals
+FIRST_PLAYER = 'computer' # options are 'computer', 'player', 'choose'
+VALID_CHOICES = ['computer', 'player']
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -72,52 +74,101 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def player_places_piece!(brd)
-  square = ''
-  loop do
-    prompt "Choose a square (#{joinor(empty_squares(brd))}):"
-    square = gets.chomp.to_i
-    # binding.pry
-    break if empty_squares(brd).include?(square)
-    prompt "Sorry that is not a valid choice"
-  end
-
-  # modify board
-  brd[square] = PLAYER_MARKER
-end
-
-def find_at_risk_square(line, board, marker)
-  if board.values_at(*line).count(marker)  == 2
-    board.select{ |k,v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-  else
-    nil
-  end
-end
-
-def computer_places_piece!(brd)
-  square = nil
-  
-  # computer AI defense
-  WINNING_LINES.each do |line|
-    square = find_at_risk_square(line, brd, PLAYER_MARKER)
-    break if square
-  end
-  
+def check_for_offense(brd,sqr)
   # computer AI offense
-  if !square
-    WINNING_LINES.each do |line|
-      square = find_at_risk_square(line, brd, COMPUTER_MARKER)
-      break if square
+  # computer offense move should be played first
+  WINNING_LINES.each do |line|
+    sqr = find_at_risk_square(line, brd, COMPUTER_MARKER)
+    break if sqr
+  end
+end
+
+# consolidate player and computer places piece methods into one
+def place_piece!(brd, player)
+  square = nil
+  if player == 'player'
+    marker = PLAYER_MARKER
+    loop do
+      prompt "Choose a square (#{joinor(empty_squares(brd))}):"
+      square = gets.chomp.to_i
+      break if empty_squares(brd).include?(square)
+      prompt "Sorry that is not a valid choice"
+    end
+  elsif player == 'computer'
+    marker = COMPUTER_MARKER
+    check_for_offense(brd,square)
+    # computer AI defense
+    if !square
+      WINNING_LINES.each do |line|
+        square = find_at_risk_square(line, brd, PLAYER_MARKER)
+        break if square
+      end
+    end
+
+    # pick square #5
+    if !square && brd[5] == ' '
+      square = 5
+    end
+    # pick a random square
+    if !square
+      square = empty_squares(brd).sample # this returns an integer
     end
   end
 
-  # pick a random square
-  if !square
-    square = empty_squares(brd).sample # this returns an integer
-  end
-
-  brd[square] = COMPUTER_MARKER
+  # modify board
+  brd[square] = marker
 end
+
+# def player_places_piece!(brd)
+#   square = nil
+#   loop do
+#     prompt "Choose a square (#{joinor(empty_squares(brd))}):"
+#     square = gets.chomp.to_i
+#     # binding.pry
+#     break if empty_squares(brd).include?(square)
+#     prompt "Sorry that is not a valid choice"
+#   end
+
+#   # modify board
+#   brd[square] = PLAYER_MARKER
+# end
+
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
+end
+
+# def computer_places_piece!(brd)
+#   square = nil
+
+#   # computer AI offense
+#   # computer offense move should be played first
+#     WINNING_LINES.each do |line|
+#       square = find_at_risk_square(line, brd, COMPUTER_MARKER)
+#       break if square
+#     end
+
+#   # computer AI defense
+#   if !square
+#     WINNING_LINES.each do |line|
+#       square = find_at_risk_square(line, brd, PLAYER_MARKER)
+#       break if square
+#     end
+#   end
+
+#   # pick square #5
+#   if !square && brd[5] == ' '
+#     square = 5
+#   end
+
+#   # pick a random square
+#   if !square
+#     square = empty_squares(brd).sample # this returns an integer
+#   end
+
+#   brd[square] = COMPUTER_MARKER
+# end
 
 def board_full?(brd)
   empty_squares(brd).empty?
@@ -147,30 +198,65 @@ def detect_winner(brd)
   nil
 end
 
+def alternate_player(player)
+  if player == 'player'
+    'computer'
+  else
+    'player'
+  end
+end
+
 player_wins = 0
 computer_wins = 0
 
+if FIRST_PLAYER == 'choose'
+  loop do
+    prompt 'Who goes first? (player or computer)'
+    current_player = gets.chomp.downcase
+    break if VALID_CHOICES.include?(current_player)
+    prompt "Sorry that is not a valid choice"
+  end
+else
+  current_player = FIRST_PLAYER
+end
+
 loop do
-  # win_counts = {'Player'=>0, 'Computer'=>0}
-  
   board = initialize_board
 
-  # ask the user to mark a square
+  # loop do
+
+  #   display_board(board)
+  #   p board
+
+  #   if player_selection == 'player'
+  #     player_places_piece!(board)
+  #     break if someone_won?(board) || board_full?(board)
+
+  #     computer_places_piece!(board)
+  #     break if someone_won?(board) || board_full?(board)
+  #   elsif player_selection == 'computer'
+  #     computer_places_piece!(board)
+  #     break if someone_won?(board) || board_full?(board)
+
+  #     display_board(board)
+  #     p board
+  #     player_places_piece!(board)
+  #     break if someone_won?(board) || board_full?(board)
+  #   end
+
+  # end
+
+  # improve the game loop by removing repetitive code
 
   loop do
-   
-
     display_board(board)
-
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-
-    computer_places_piece!(board)
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
 
   display_board(board)
-  
+
   if someone_won?(board)
     prompt "#{detect_winner(board)} won!"
     if detect_winner(board) == 'Player'
@@ -186,7 +272,7 @@ loop do
     prompt "#{detect_winner(board)} has won 5 games! Game Over!"
     break
   end
-  
+
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
