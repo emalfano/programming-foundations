@@ -9,41 +9,48 @@ require 'pry'
 SUITS = ['H', 'D', 'S', 'C']
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', 'A', 'J', 'Q', 'K']
 
-player_cards = []
-dealer_cards = []
-
 def prompt(msg)
   puts "=> #{msg}"
 end
 
 def initialize_deck
-  SUITS.
+  SUITS.product(VALUES).shuffle # combines the suits and values arrays and 
+  # returns shuffled
 end
 
-def deal_cards(num)
+def player_turn(player_cards, deck)
+  loop do
+  player_answer = nil
+
+    loop do
+      prompt "(H)it or (S)tay?"
+      player_answer = gets.chomp.downcase
+      break if player_answer == 's' || player_answer == 'h'
+      prompt "Please enter 'h' or 's'"
+    end
+    
+    if player_answer == 'h'
+      player_cards << deck.pop
+      prompt "You chose to hit!"
+      prompt "Your cards are now: #{player_cards}"
+      prompt "Your total is now: #{total(player_cards)}"
+    end
+    
+    break if player_answer == 's' || busted?(player_cards)
+  end
   
 end
 
-def player_turn(player_cards)
-  answer = nil
-
-  loop do
-    puts "your cards: "
-    p player_cards
-    prompt "Hit or Stay?"
-    answer = gets.chomp.downcase
-    break if answer == 'stay' || busted?(total(player_cards))
-    player_cards << [['S', '10']]
-  end
-end
-
-def dealer_turn(dealer_cards)
+def dealer_turn(dealer_cards,deck)
   loop do
     # dealer turn check for break condition at top b/c it's done programatically?
-    break if dealer_stay?(total(dealer_cards)) || busted?(total(dealer_cards))
-    dealer_cards << [['S', '10']]
+    break if total(dealer_cards) >= 17
+    prompt "Dealer hits!"
+    
+    dealer_cards << deck.pop
+    prompt "Dealer's cards are now: #{dealer_cards}"
   end
-  
+  prompt "Dealer stayed!"
 end
 
 def total(cards)
@@ -69,65 +76,95 @@ def total(cards)
   sum
 end
 
-def busted?(total)
-  total > 21
+def busted?(cards)
+  total(cards) > 21
 end
 
 def dealer_stay?(total)
   total > 17
 end
 
-def determine_winner(player_total,dealer_total)
-  if busted?(player_total)
-    return 'Dealer'
-  elsif busted?(dealer_total)
-    return 'Player'
-  end
+def determine_winner(player_cards,dealer_cards)
   
-  player_diff = 21 - player_total
-  dealer_diff = 21 - dealer_total
+  player_total = total(player_cards)
+  dealer_total = total(dealer_cards)
   
-  if player_diff < dealer_diff && player_diff >= 0
-    'Player'
-  elsif dealer_diff < player_diff && dealer_diff >= 0 && 
-    'Dealer'
+  if player_total > 21
+    :player_busted
+  elsif dealer_total > 21
+    :dealer_busted
+  elsif dealer_total < player_total
+    :player
+  elsif dealer_total > player_total
+    :dealer
   else
-    'Draw'
+    :tie
   end
 end
 
 def display_result(who_won)
-  if who_won == 'Player' || who_won == 'Dealer'
-    puts "winner is #{who_won}!"
-  else
-    puts "It's a draw!"
+  case who_won
+  when :player_busted
+    prompt "You busted! Dealer wins!"
+  when :dealer_busted
+    prompt "Dealer busted! You win!"
+  when :player
+    prompt "You won!"
+  when :dealer
+    prompt "Dealer wins!"
+  when :tie
+    puts "It's a tie!"
   end
 end
 
-player_cards = [['S', 'A'], ['D', 'A'], ['S', '2']]
-dealer_cards = [['S', 'A'], ['D', 'A'], ['S', '2']]
+prompt "Welcome to Twenty-one!"
 
-#prompt(player_cards)
-player_turn(player_cards)
-puts 'player cards'
-p player_cards
-dealer_turn(dealer_cards)
-p 'dealer_cards'
-p dealer_cards
+loop do
+  prompt "Shuffling deck ..."
+  deck = initialize_deck
+  player_cards = []
+  dealer_cards = []
+  
+  # deal cards
+  2.times do 
+    player_cards << deck.pop
+    dealer_cards << deck.pop
+  end
+  
+  prompt "Dealer has #{dealer_cards[0]} and ?"
+  prompt "You have #{player_cards[0]} and #{player_cards[1]}, for a total of #{total(player_cards)}"
+  
+  player_turn(player_cards, deck)
+  
+  if busted?(player_cards)
+    display_result(determine_winner(player_cards,dealer_cards))  
+    break
+  end
+  
+  prompt "You stayed at #{total(player_cards)}"
+  
+  prompt "Dealer turn..."
+  dealer_turn(dealer_cards,deck)
+  
+  if busted?(dealer_cards)
+    # end the game or ask user to play again?
+    prompt "Dealer total is now #{total(dealer_cards)}"
+    display_result(determine_winner(player_cards,dealer_cards))
+    break
+  end
+  
+  # both player and dealer stays - compare cards!
+  puts "=============="
+  prompt "Dealer has #{dealer_cards}, for a total of: #{total(dealer_cards)}"
+  prompt "Player has #{player_cards}, for a total of: #{total(player_cards)}"
+  puts "=============="
+  
+  winner = determine_winner(player_cards,dealer_cards)
+  #winner = determine_winner(total(player_cards),total(dealer_cards))
+  display_result(winner)
 
-# total([['S', 'A'], ['D', 'A'], ['S', '2']])
-# total([['S', 'A'], ['D', '2'], ['S', '2']])
-# total([['S', '10'],['S','A']])
-
-if busted?(total(player_cards))
-  # end the game or ask user to play again?
-  prompt "Sorry! You busted!"
-else
-  # user "stay-ed"
-  prompt "You chose to stay"
+  prompt "Do you want to play again?(Y/N)"
+  answer = gets.chomp.downcase
+  break unless answer == 'y'
 end
-
-winner = determine_winner(22, 20)
-#winner = determine_winner(total(player_cards),total(dealer_cards))
-display_result(winner)
 prompt "Thank you for playing Twenty-one! Good-bye!"
